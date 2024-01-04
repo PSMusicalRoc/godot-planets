@@ -1,0 +1,51 @@
+[gd_scene load_steps=7 format=3 uid="uid://4uqshretgtx5"]
+
+[ext_resource type="Script" path="res://Scripts/Components/PlanetScripts/planet_root_tool.gd" id="1_pq1ia"]
+[ext_resource type="Script" path="res://Scripts/Components/PlanetScripts/gravity_area_planet.gd" id="2_xirhe"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3y18c"]
+albedo_color = Color(0.556863, 0.243137, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aorlf"]
+transparency = 1
+albedo_color = Color(0, 1, 1, 0.0588235)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_8yiyl"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_4rdct"]
+
+[node name="Planet" type="Node3D" node_paths=PackedStringArray("planet_collision", "planet_mesh", "gravity_area", "gravity_mesh")]
+script = ExtResource("1_pq1ia")
+planet_collision = NodePath("PlanetCollision/PlanetCollisionShape")
+planet_mesh = NodePath("PlanetCollision/PlanetCollisionShape/CSGSphere3D")
+gravity_area = NodePath("GravityArea/GravityCollisionShape")
+gravity_mesh = NodePath("GravityArea/GravityCollisionShape/CSGSphere3D")
+planet_material = SubResource("StandardMaterial3D_3y18c")
+gravity_material = SubResource("StandardMaterial3D_aorlf")
+
+[node name="PlanetCollision" type="RigidBody3D" parent="."]
+collision_mask = 13
+gravity_scale = 0.0
+
+[node name="PlanetCollisionShape" type="CollisionShape3D" parent="PlanetCollision"]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
+shape = SubResource("SphereShape3D_8yiyl")
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="PlanetCollision/PlanetCollisionShape"]
+material = SubResource("StandardMaterial3D_3y18c")
+
+[node name="GravityArea" type="Area3D" parent="." node_paths=PackedStringArray("planet_body")]
+collision_layer = 2
+collision_mask = 8
+script = ExtResource("2_xirhe")
+planet_body = NodePath("../PlanetCollision")
+
+[node name="GravityCollisionShape" type="CollisionShape3D" parent="GravityArea"]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0)
+shape = SubResource("SphereShape3D_4rdct")
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="GravityArea/GravityCollisionShape"]
+material = SubResource("StandardMaterial3D_aorlf")
+
+[connection signal="body_entered" from="GravityArea" to="GravityArea" method="on_body_enter"]
+[connection signal="body_exited" from="GravityArea" to="GravityArea" method="on_body_exit"]

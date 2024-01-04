@@ -1,0 +1,47 @@
+[gd_scene load_steps=6 format=3 uid="uid://1s4vktxc18ki"]
+
+[ext_resource type="Script" path="res://Scripts/Components/PlayerScripts/player_root_data.gd" id="1_d2vng"]
+[ext_resource type="Script" path="res://Scripts/Components/PlayerScripts/player_movement.gd" id="1_lr6ga"]
+[ext_resource type="Script" path="res://Scripts/Components/camera_movement.gd" id="2_08f3o"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5brum"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pp7u7"]
+albedo_color = Color(0, 1, 1, 1)
+
+[node name="Player" type="Node3D"]
+script = ExtResource("1_d2vng")
+
+[node name="PlayerCharacterBody" type="CharacterBody3D" parent="." node_paths=PackedStringArray("collision", "spring_arm")]
+collision_layer = 12
+collision_mask = 65535
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+script = ExtResource("1_lr6ga")
+collision = NodePath("Collision")
+spring_arm = NodePath("SpringArm3D")
+
+[node name="Collision" type="CollisionShape3D" parent="PlayerCharacterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_5brum")
+
+[node name="Model" type="CSGCylinder3D" parent="PlayerCharacterBody/Collision"]
+material = SubResource("StandardMaterial3D_pp7u7")
+
+[node name="Nose" type="CSGCylinder3D" parent="PlayerCharacterBody/Collision"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0.571643, -0.417223)
+radius = 0.1
+height = 0.5
+
+[node name="SpringArm3D" type="SpringArm3D" parent="PlayerCharacterBody" node_paths=PackedStringArray("parent_node")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+top_level = true
+spring_length = 5.0
+script = ExtResource("2_08f3o")
+camera_offset_from_player = Vector3(0, 1, 0)
+parent_node = NodePath("..")
+
+[node name="Camera3D" type="Camera3D" parent="PlayerCharacterBody/SpringArm3D"]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
